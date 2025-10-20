@@ -5,7 +5,7 @@
 ## Prerequisites
 
 ```bash
-sudo apt install zoxide
+sudo apt install zoxide thefuck zoxide fzf bat tealdeer lsd
 ```
 
 ## Installation/Setup
