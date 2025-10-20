@@ -2,6 +2,12 @@
 
 > Based on HHousen's configuration files managed by [chezmoi](https://github.com/twpayne/chezmoi). Uses [Zsh](https://en.wikipedia.org/wiki/Z_shell), [Antigen](https://github.com/zsh-users/antigen) for plugin management, [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh/) for plugins and themes, [powerlevel10k](https://github.com/romkatv/powerlevel10k) as the theme, [Oh My Tmux](https://github.com/gpakosz/.tmux) for custom tmux configuration, [Atuin](https://github.com/atuinsh/atuin) for terminal history, and some tools from [modern-unix](https://github.com/ibraheemdev/modern-unix).
 
+## Prerequisites
+
+```bash
+sudo apt install zoxide
+```
+
 ## Installation/Setup
 
 Before following the installation steps below, create the file `~/.config/chezmoi/chezmoi.toml` with the following content:
