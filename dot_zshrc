@@ -37,4 +37,3 @@ export DISPLAY=$localhost:10.0
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 eval "$(zoxide init zsh)"
 
-fastfetch --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
