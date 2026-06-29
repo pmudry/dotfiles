@@ -6,7 +6,13 @@
 # false positive here. Set before anything can call `cd`/`z`.
 export _ZO_DOCTOR=0
 
-fastfetch --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
+# Put ~/.local/bin on PATH up front: the fastfetch banner below lives there, and
+# a fresh login shell (Windows Terminal → WSL) doesn't have it on PATH yet.
+export PATH="$HOME/.local/bin:$PATH"
+
+# fastfetch banner. Guarded so a machine without it doesn't trip the
+# command-not-found handler ("fastfetch is not installed") on every launch.
+command -v fastfetch >/dev/null && fastfetch --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -14,8 +20,6 @@ fastfetch --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
-export PATH=/home/pmudry/.local/bin:$PATH
 
 
 # Keep 10,000,000 lines of history within the shell and save it to ~/.zsh_history:
