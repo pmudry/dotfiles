@@ -1,8 +1,9 @@
 #!/bin/sh
 # One-time bootstrap for a fresh machine. Kept sudo-free.
-# Installs only what ~/.zshrc needs to start cleanly: antigen + fastfetch, and
-# links the gpakosz tmux config. Extra CLI tools (bat/lsd/atuin/thefuck/tealdeer)
-# are intentionally NOT installed here — add them via your package manager if wanted.
+# Installs what ~/.zshrc needs to start cleanly: antigen, fastfetch and zoxide
+# (the latter two via their sudo-free installers into ~/.local/bin), and links
+# the gpakosz tmux config. Extra CLI tools (bat/lsd/atuin/thefuck/tealdeer) are
+# intentionally NOT installed here — add them via your package manager if wanted.
 
 # antigen (zsh plugin manager). The old git.io shortener was retired in 2022,
 # so fetch from the canonical raw URL instead.
@@ -26,6 +27,19 @@ if ! command -v fastfetch >/dev/null 2>&1; then
     rm -rf "$_tmp"
 {{ else if eq .chezmoi.os "darwin" -}}
     brew install fastfetch
+{{ end -}}
+fi
+
+# zoxide — ~/.zshrc calls `zoxide init` unconditionally and aliases `cd` to `z`,
+# so it's a hard dependency, not an optional extra. Its official installer is
+# sudo-free and drops the binary into ~/.local/bin (already on PATH).
+if ! command -v zoxide >/dev/null 2>&1; then
+    echo "Installing zoxide..."
+{{ if eq .chezmoi.os "linux" -}}
+    mkdir -p "$HOME/.local/bin"
+    curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+{{ else if eq .chezmoi.os "darwin" -}}
+    brew install zoxide
 {{ end -}}
 fi
 

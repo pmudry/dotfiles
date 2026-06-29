@@ -17,8 +17,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply pmudry
 This will:
 
 1. **Prompt for your git name and email** (used to generate `~/.gitconfig`).
-2. **Bootstrap the shell** — download `antigen`, install `fastfetch`, and link the
-   tmux config. This runs without `sudo`.
+2. **Bootstrap the shell** — download `antigen`, install `fastfetch` and `zoxide`,
+   and link the tmux config. This runs without `sudo`.
 3. **Write the dotfiles** into your `$HOME`.
 
 Then start a new shell:
@@ -51,11 +51,10 @@ git push
 
 ## Optional extra CLI tools
 
-The bootstrap only installs what the shell needs to start. These are referenced by the
-config but optional — install whichever you want with your package manager:
+The bootstrap installs what the shell needs to start (including `zoxide`, which powers
+the `cd` → `z` alias). These extras are referenced by the config but optional — install
+whichever you want with your package manager:
 
 ```bash
-sudo apt install zoxide fzf bat lsd tealdeer thefuck atuin
+sudo apt install fzf bat lsd tealdeer thefuck atuin
 ```
-
-(`zoxide` powers the `cd` → `z` alias, so it's the one most worth having.)
