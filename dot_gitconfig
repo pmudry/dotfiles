@@ -5,6 +5,8 @@
 	defaultBranch = main
 [push]
 	autoSetupRemote = true
+[pull]
+	ff = only
 [alias]
 	# Undo last commit but keep changes
 	undo = reset HEAD~1 --soft

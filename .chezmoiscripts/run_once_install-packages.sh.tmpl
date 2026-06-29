@@ -1,20 +1,33 @@
 #!/bin/sh
+# One-time bootstrap for a fresh machine. Kept sudo-free.
+# Installs only what ~/.zshrc needs to start cleanly: antigen + fastfetch, and
+# links the gpakosz tmux config. Extra CLI tools (bat/lsd/atuin/thefuck/tealdeer)
+# are intentionally NOT installed here — add them via your package manager if wanted.
 
-echo "Installing packages... May need sudo access"
-{{ if eq .chezmoi.os "linux" -}}
-sudo pacman -S --needed thefuck atuin zoxide fzf bat tealdeer lsd
-{{ else if eq .chezmoi.os "darwin" -}}
-brew install thefuck atuin zoxide fzf bat tealdeer lsd
-{{ end -}}
-
-echo "Updating tldr cache..."
-tldr --update
-
-echo "Symbolically linking tmux runtime config..."
-ln -s -f ~/.tmux_runtime/.tmux.conf ~/.tmux.conf
-
-# if ~/antigen.zsh does not exists or is empty, download it
-if [ ! -f ~/antigen.zsh ] || [ ! -s ~/antigen.zsh ]; then
+# antigen (zsh plugin manager). The old git.io shortener was retired in 2022,
+# so fetch from the canonical raw URL instead.
+if [ ! -s "$HOME/antigen.zsh" ]; then
     echo "Downloading antigen..."
-    curl -L git.io/antigen > ~/antigen.zsh
+    curl -fsSL https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > "$HOME/antigen.zsh"
 fi
+
+# fastfetch — shown as a banner at the top of ~/.zshrc.
+if ! command -v fastfetch >/dev/null 2>&1; then
+    echo "Installing fastfetch..."
+{{ if eq .chezmoi.os "linux" -}}
+    # Not in Ubuntu 24.04 apt; drop the static binary into ~/.local/bin (no sudo).
+    mkdir -p "$HOME/.local/bin"
+    _tmp="$(mktemp -d)"
+    if curl -fsSL "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.tar.gz" -o "$_tmp/ff.tgz"; then
+        tar -xzf "$_tmp/ff.tgz" -C "$_tmp"
+        _bin="$(find "$_tmp" -type f -name fastfetch | head -n1)"
+        [ -n "$_bin" ] && install -m 0755 "$_bin" "$HOME/.local/bin/fastfetch"
+    fi
+    rm -rf "$_tmp"
+{{ else if eq .chezmoi.os "darwin" -}}
+    brew install fastfetch
+{{ end -}}
+fi
+
+# gpakosz tmux config (downloaded as a chezmoi external into ~/.tmux_runtime).
+ln -s -f "$HOME/.tmux_runtime/.tmux.conf" "$HOME/.tmux.conf"
