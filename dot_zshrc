@@ -77,10 +77,23 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # opencode
 [ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
 
-# nvm
+# nvm — sourcing nvm.sh eagerly runs `nvm use` for the default alias on *every*
+# shell (~0.9s, ~65% of startup). Instead: put the default node on PATH directly
+# (cheap, and visible to child processes too), and load nvm's machinery lazily on
+# the first `nvm` call.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+if [[ -d "$NVM_DIR/versions/node" ]]; then
+  # newest installed version = what the `default -> node` alias resolves to
+  _nvm_default="$(command ls -1v "$NVM_DIR/versions/node" 2>/dev/null | tail -1)"
+  [[ -n "$_nvm_default" ]] && export PATH="$NVM_DIR/versions/node/$_nvm_default/bin:$PATH"
+  unset _nvm_default
+fi
+nvm() {
+  unset -f nvm
+  [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh" --no-use
+  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
 
 # SDKMAN — must stay at the very end of the file
 export SDKMAN_DIR="$HOME/.sdkman"
