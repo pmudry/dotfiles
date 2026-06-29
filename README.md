@@ -1,61 +1,61 @@
 # pmudry's dotfiles
 
-> Based on HHousen's configuration files managed by [chezmoi](https://github.com/twpayne/chezmoi). Uses [Zsh](https://en.wikipedia.org/wiki/Z_shell), [Antigen](https://github.com/zsh-users/antigen) for plugin management, [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh/) for plugins and themes, [powerlevel10k](https://github.com/romkatv/powerlevel10k) as the theme, [Oh My Tmux](https://github.com/gpakosz/.tmux) for custom tmux configuration, [Atuin](https://github.com/atuinsh/atuin) for terminal history, and some tools from [modern-unix](https://github.com/ibraheemdev/modern-unix).
+My personal config files, managed with [chezmoi](https://github.com/twpayne/chezmoi).
+Stack: [Zsh](https://www.zsh.org/) + [Antigen](https://github.com/zsh-users/antigen) plugins,
+[powerlevel10k](https://github.com/romkatv/powerlevel10k) theme,
+[Oh My Tmux](https://github.com/gpakosz/.tmux), and a handful of
+[modern-unix](https://github.com/ibraheemdev/modern-unix) tools.
 
-## Prerequisites
+## Install on a new machine
+
+One command installs `chezmoi`, pulls this repo, and applies it:
 
 ```bash
-sudo apt install zoxide thefuck zoxide fzf bat tealdeer lsd
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply pmudry
 ```
 
-## Installation/Setup
+This will:
 
-Before following the installation steps below, create the file `~/.config/chezmoi/chezmoi.toml` with the following content:
+1. **Prompt for your git name and email** (used to generate `~/.gitconfig`).
+2. **Bootstrap the shell** — download `antigen`, install `fastfetch`, and link the
+   tmux config. This runs without `sudo`.
+3. **Write the dotfiles** into your `$HOME`.
 
-```toml
-[data]        
-    git_email="pmudry@gmail.com"
-    git_name="Pierre-André Mudry"
+Then start a new shell:
+
+```bash
+zsh
 ```
 
-This file defines variables to be used by [`chezmoi`'s templates](https://github.com/twpayne/chezmoi/blob/master/docs/HOWTO.md#use-templates).
+On first launch `antigen` downloads and installs the rest of the Zsh plugins and the theme.
 
-Explanation of the options:
+## Updating
 
-- `git_email` and `git_name`: Global git user email and name set in `~/.gitconfig`.
+**Pull the latest config onto this machine** (git pull + apply in one step):
 
-### One Command
+```bash
+chezmoi update
+```
 
-Run `sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply pmudry` to get everything downloaded and installed or follow the individual steps below.
+**Change the config and push it back:**
 
-### Individual Steps
+```bash
+chezmoi cd               # jump to the source repo (~/.local/share/chezmoi)
+chezmoi add <file>       # start tracking a new/changed file from $HOME
+# ...edit files here...
+chezmoi diff             # preview what `apply` would change in $HOME
+chezmoi apply            # apply the changes locally
+git commit -am "..."     # commit and push so other machines get them
+git push
+```
 
-1. Install `chezmoi` by following [chezmoi's install guide](https://github.com/twpayne/chezmoi/blob/master/docs/INSTALL.md). You can learn more about `chezmoi` by reading their [quick start guide](https://github.com/twpayne/chezmoi/blob/master/docs/QUICKSTART.md) or [how-to guide](https://github.com/twpayne/chezmoi/blob/master/docs/HOWTO.md).
+## Optional extra CLI tools
 
-2. Initialize `chezmoi` using this repository: `chezmoi init https://github.com/pmudry/dotfiles.git`.
+The bootstrap only installs what the shell needs to start. These are referenced by the
+config but optional — install whichever you want with your package manager:
 
-3. Preview changes that `chezmoi` would make to your `$HOME`: `chezmoi diff`.
+```bash
+sudo apt install zoxide fzf bat lsd tealdeer thefuck atuin
+```
 
-4. Apply the changes: `chezmoi apply`. This will automatically install antigen and packages required for certain plugins using the [run_once_install-packages.sh](run_once_install-packages.sh) script. Upon the first launch, `antigen` will initialize and install everything else.
-
-5. Launch zsh: `zsh`.
-
-## Included tools
-
-- [zsh](https://www.zsh.org/) as the shell
-- [chezmoi](https://github.com/twpayne/chezmoi) for dotfiles management
-- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh/) for plugins and themes
-- [Antigen](https://github.com/zsh-users/antigen) for plugin management
-- [powerlevel10k](https://github.com/romkatv/powerlevel10k) as the theme
-- [Oh My Tmux](https://github.com/gpakosz/.tmux) for custom tmux configuration
-- [Atuin](https://github.com/atuinsh/atuin) for terminal history
-- [zoxide](https://github.com/ajeetdsouza/zoxide) for a smarter `cd` command
-- [bat](https://github.com/sharkdp/bat) for a better `cat` command
-
-## Workflow
-
-1. Run `chezmoi add <file>` to add files to the chezmoi repo.
-2. Edit files in `~/.local/share/chezmoi` or wherever the chezmoi repo is (`chezmoi cd` to find out).
-3. Git commit (and eventually push) the changes.
-4. Run `chezmoi diff` to preview the changes that will be made to your `$HOME`.
-5. Run `chezmoi apply` to apply the changes to your `$HOME`.
+(`zoxide` powers the `cd` → `z` alias, so it's the one most worth having.)
