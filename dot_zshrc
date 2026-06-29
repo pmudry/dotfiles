@@ -1,3 +1,11 @@
+# Silence zoxide's "initialize at the end of your config" doctor warning.
+# It fires when `z` (our `cd` alias) runs before zoxide's chpwd hook is
+# registered. Some harnesses (e.g. an agent shell) inject a `cd` into the
+# cwd on every fresh shell before this rc finishes sourcing, so it warns
+# on every command. The init below is deliberate and works; the check is a
+# false positive here. Set before anything can call `cd`/`z`.
+export _ZO_DOCTOR=0
+
 fastfetch --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.

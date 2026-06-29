@@ -13,7 +13,8 @@ antigen bundle safe-paste  # prevent any commands from running when pasted
 # antigen bundle thefuck  # double press ESC to trigger thefuck
 antigen bundle dirhistory  # keyboard shortcuts to navigate directories
 antigen bundle cp  # adds cpv command (aka cp with progress bar aka rsync)
-antigen bundle zoxide  # smarter cd command
+# zoxide is initialized explicitly in ~/.zshrc (`eval "$(zoxide init zsh)"`);
+# don't load it here too or it gets initialized twice.
 antigen bundle colored-man-pages  # man pages with color
 
 # Additional bundles
