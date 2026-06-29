@@ -1,6 +1,6 @@
 [user]
-	email = pmudry@gmail.com
-	name = Pierre-André Mudry
+	email = {{ .git_email }}
+	name = {{ .git_name }}
 [init]
 	defaultBranch = main
 [push]
@@ -19,8 +19,8 @@
 [branch]
 	sort = -committerdate
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
