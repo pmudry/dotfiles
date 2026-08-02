@@ -115,3 +115,12 @@ nvm() {
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+
+# Persistent ssh-agent on a fixed socket, reused across all sessions
+# (incl. Claude Code shells). Key loading stays manual: ssh-add ~/.ssh/key_2024-id_ed25519
+export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+ssh-add -l >/dev/null 2>&1
+if [ $? -eq 2 ]; then  # 2 = no agent listening on the socket
+    rm -f "$SSH_AUTH_SOCK"
+    eval "$(ssh-agent -a "$SSH_AUTH_SOCK")" >/dev/null
+fi
