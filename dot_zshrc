@@ -68,6 +68,11 @@ alias cd="z"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 eval "$(zoxide init zsh)"
 
+# fzf shell integration: Ctrl-R fuzzy history, Ctrl-T file picker, Alt-C cd,
+# and `**<Tab>` completion. Needs the real compdef (restored at compinit above)
+# and fzf >= 0.48 for the `--zsh` flag. Guarded: no-op where fzf isn't installed.
+command -v fzf >/dev/null && source <(fzf --zsh)
+
 # ──────────────────────────────────────────────────────────────────────────
 # Per-machine toolchains (merged from this box's pre-chezmoi ~/.zshrc).
 # All guarded, so each is a no-op on machines where the tool isn't installed.
