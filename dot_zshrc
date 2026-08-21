@@ -12,7 +12,13 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # fastfetch banner. Guarded so a machine without it doesn't trip the
 # command-not-found handler ("fastfetch is not installed") on every launch.
-command -v fastfetch >/dev/null && fastfetch --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
+#
+# --ds-force-drm: the `display` module's default backend is Wayland. Under WSLg
+# the compositor socket (/mnt/wslg/runtime-dir/wayland-0) accepts the connection
+# but never answers the roundtrip, so fastfetch blocks in poll() forever and the
+# terminal hangs with the logo half-drawn. Forcing the DRM backend skips Wayland
+# entirely; WSL exposes no DRM device, so the module simply prints nothing.
+command -v fastfetch >/dev/null && fastfetch --ds-force-drm true --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
