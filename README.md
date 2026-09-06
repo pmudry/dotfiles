@@ -49,6 +49,14 @@ git commit -am "..."     # commit and push so other machines get them
 git push
 ```
 
+## Claude Code status line
+
+`~/.claude/statusline.sh` prints `model · directory · git branch` at the bottom of
+the Claude Code terminal. The script is managed here; `~/.claude/settings.json`
+is not (it carries per-machine permissions and model choice), so
+`.chezmoiscripts/run_after_claude-statusline.sh.tmpl` merges just the
+`statusLine` key into it on every `chezmoi apply`. Restart Claude Code to see it.
+
 ## Optional extra CLI tools
 
 The bootstrap installs what the shell needs to start (including `zoxide`, which powers
