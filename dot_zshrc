@@ -99,6 +99,19 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # CUDA toolkit
 [ -d /usr/local/cuda-13/bin ] && export PATH="$PATH:/usr/local/cuda-13/bin"
 
+# GitHub token for the Claude Code github plugin's MCP server. Its .mcp.json
+# sends `Authorization: Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}`, so with the
+# variable unset the header reaches api.githubcopilot.com unsubstituted and the
+# server refuses to connect with "400 — Authorization header is badly
+# formatted". Read from gh rather than stored: no token on disk, and rotations
+# follow on their own. MCP servers inherit this from the Claude Code process,
+# so a running session needs a restart to pick it up.
+if command -v gh >/dev/null 2>&1; then
+    _gh_token="$(gh auth token 2>/dev/null)"
+    [ -n "$_gh_token" ] && export GITHUB_PERSONAL_ACCESS_TOKEN="$_gh_token"
+    unset _gh_token
+fi
+
 # nvm — sourcing nvm.sh eagerly runs `nvm use` for the default alias on *every*
 # shell (~0.9s, ~65% of startup). Instead: put the default node on PATH directly
 # (cheap, and visible to child processes too), and load nvm's machinery lazily on
