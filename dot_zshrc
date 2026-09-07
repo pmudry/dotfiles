@@ -49,22 +49,34 @@ antigen bundle command-not-found
 # Re-run compinit (cached → fast) to restore the real compdef before using it.
 autoload -Uz compinit && compinit -C
 
-# just (https://github.com/casey/just) shell completion — clap's dynamic completer,
-# regenerated live on each shell start so it never goes stale. The script this
-# version of just emits ends with a bare `_just "$@"`, which fires the completer
-# outside a completion context ("_arguments: can only be called from completion
-# function") and never registers anything. Drop that trailing call and wire the
-# function up with compdef ourselves; the sed is a no-op on newer just releases,
-# whose footer already guards the call with a $funcstack check.
+# just (https://github.com/casey/just) shell completion — clap's dynamic
+# completer, regenerated live on each shell start so it never goes stale.
+# What `just --completions zsh` prints is a `#compdef just` autoload stub, not
+# something meant to be sourced: older releases end it with a bare `_just "$@"`
+# that fires outside a completion context ("_arguments: can only be called from
+# completion function"), and newer ones guard that call behind a $funcstack
+# check, so sourcing defines the real completer but registers nothing. Strip the
+# bare call (a no-op on newer just), then bind the name the stub expects to the
+# completer it defined and register that ourselves.
 if command -v just >/dev/null; then
   source <(just --completions zsh | sed '/^_just "\$@"$/d')
-  compdef _just just
+  if (( ! $+functions[_just] )) && (( $+functions[_clap_dynamic_completer_just] )); then
+    functions[_just]=$functions[_clap_dynamic_completer_just]
+  fi
+  (( $+functions[_just] )) && compdef _just just
 fi
 
 # Aliases
 #alias rcat="$(which cat)"
 #alias cat="$(which bat)"
 alias cd="z"
+
+# lsd replaces ls (icons need a Nerd Font in the terminal profile).
+alias ls="lsd"
+alias ll="lsd -l"
+alias la="lsd -lA"
+alias l="lsd -lA"
+alias lt="lsd --tree"
 
 # export DISPLAY=$localhost:10.0  # WSL X-forwarding to an external X server on :10.
 # Disabled: under WSLg, DISPLAY is auto-set to :0; forcing :10.0 breaks GUI apps.
@@ -75,9 +87,20 @@ alias cd="z"
 eval "$(zoxide init zsh)"
 
 # fzf shell integration: Ctrl-R fuzzy history, Ctrl-T file picker, Alt-C cd,
-# and `**<Tab>` completion. Needs the real compdef (restored at compinit above)
-# and fzf >= 0.48 for the `--zsh` flag. Guarded: no-op where fzf isn't installed.
-command -v fzf >/dev/null && source <(fzf --zsh)
+# and `**<Tab>` completion. Needs the real compdef (restored at compinit above).
+# The `--zsh` flag only exists from fzf 0.48; Debian/Ubuntu still ship 0.44,
+# which installs the very same snippets under /usr/share/doc/fzf/examples
+# instead. Try the flag, fall back to the packaged files, no-op without fzf.
+if command -v fzf >/dev/null; then
+  if fzf --zsh >/dev/null 2>&1; then
+    source <(fzf --zsh)
+  else
+    for _fzf_snippet in /usr/share/doc/fzf/examples/{key-bindings,completion}.zsh; do
+      [ -r "$_fzf_snippet" ] && source "$_fzf_snippet"
+    done
+    unset _fzf_snippet
+  fi
+fi
 
 # ──────────────────────────────────────────────────────────────────────────
 # Per-machine toolchains (merged from this box's pre-chezmoi ~/.zshrc).
@@ -135,11 +158,21 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 
-# Persistent ssh-agent on a fixed socket, reused across all sessions
-# (incl. Claude Code shells). Key loading stays manual: ssh-add ~/.ssh/key_2024-id_ed25519
-export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
-ssh-add -l >/dev/null 2>&1
-if [ $? -eq 2 ]; then  # 2 = no agent listening on the socket
-    rm -f "$SSH_AUTH_SOCK"
-    eval "$(ssh-agent -a "$SSH_AUTH_SOCK")" >/dev/null
+# ssh-agent: one agent shared by every session on a fixed socket, so keys get
+# loaded once (`ssh-add ~/.ssh/key_2024-id_ed25519`) and stay reachable from any
+# shell — including the ones tooling spawns for itself.
+#
+# Boxes running the systemd user unit ~/.config/systemd/user/ssh-agent.service
+# already have an agent on $XDG_RUNTIME_DIR/ssh-agent.socket; prefer it, since
+# systemd owns its lifecycle and there is no start-up race. Everywhere else,
+# fall back to self-spawning one on ~/.ssh/agent.sock.
+if [ -S "${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket" ]; then
+    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket"
+else
+    export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+    ssh-add -l >/dev/null 2>&1
+    if [ $? -eq 2 ]; then  # 2 = no agent listening on the socket
+        rm -f "$SSH_AUTH_SOCK"
+        eval "$(ssh-agent -a "$SSH_AUTH_SOCK")" >/dev/null
+    fi
 fi
