@@ -103,11 +103,6 @@
             "type": "custom",
             "format": "{$1}",
             "outputColor": "separator"
-        },
-        "break",
-        {
-            "type": "colors",
-            "paddingLeft": 15
         }
     ]
 }

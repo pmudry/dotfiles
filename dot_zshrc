@@ -18,7 +18,15 @@ export PATH="$HOME/.local/bin:$PATH"
 # but never answers the roundtrip, so fastfetch blocks in poll() forever and the
 # terminal hangs with the logo half-drawn. Forcing the DRM backend skips Wayland
 # entirely; WSL exposes no DRM device, so the module simply prints nothing.
-command -v fastfetch >/dev/null && fastfetch --ds-force-drm true --logo-type file --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
+#
+# The logo is a chafa render of the ISC petals symbol, baked to a file rather
+# than rendered live: fastfetch's own image logo types (chafa/sixel/kitty) first
+# ask the terminal for its cell pixel size (CSI 14t). This one never answers, so
+# `--chafa <image>` hangs the shell instead of falling back — tested, needs a
+# Ctrl-C. A pre-rendered .ans queries nothing. Regenerate with:
+#   chafa -f symbols -s 36x18 --polite on \
+#     "$HOME/git/isc/isc-logos/symbol only/ISC_logo_rvb.svg" > ~/.config/fastfetch/isc-logo.ans
+command -v fastfetch >/dev/null && fastfetch --ds-force-drm true --logo-type file-raw --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
