@@ -26,7 +26,15 @@ export PATH="$HOME/.local/bin:$PATH"
 # Ctrl-C. A pre-rendered .ans queries nothing. Regenerate with:
 #   chafa -f symbols -s 36x18 --polite on \
 #     "$HOME/git/isc/isc-logos/symbol only/ISC_logo_rvb.svg" > ~/.config/fastfetch/isc-logo.ans
-command -v fastfetch >/dev/null && fastfetch --ds-force-drm true --logo-type file-raw --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
+#
+# --ds-force-drm is only wired up in Linux builds; the macOS binary lists it in
+# --help but rejects it at runtime ("unknown option"), so pass it on Linux only.
+if command -v fastfetch >/dev/null; then
+  _ff_opts=()
+  [[ "$OSTYPE" == linux* ]] && _ff_opts+=(--ds-force-drm true)
+  fastfetch "${_ff_opts[@]}" --logo-type file-raw --logo ~/.config/fastfetch/isc-logo.ans -c ~/.config/fastfetch/examples/22.jsonc
+  unset _ff_opts
+fi
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
