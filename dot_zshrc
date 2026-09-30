@@ -174,7 +174,11 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # already have an agent on $XDG_RUNTIME_DIR/ssh-agent.socket; prefer it, since
 # systemd owns its lifecycle and there is no start-up race. Everywhere else,
 # fall back to self-spawning one on ~/.ssh/agent.sock.
-if [ -S "${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket" ]; then
+# macOS already runs a launchd ssh-agent (with Keychain integration) and sets
+# SSH_AUTH_SOCK for every session, so leave it alone there.
+if [[ "$OSTYPE" == darwin* ]]; then
+    :
+elif [ -S "${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket" ]; then
     export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket"
 else
     export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
