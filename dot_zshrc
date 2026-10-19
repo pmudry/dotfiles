@@ -94,6 +94,11 @@ alias la="lsd -lA"
 alias l="lsd -lA"
 alias lt="lsd --tree"
 
+# herdr: attach to the always-on workspace on darkstar. Panes, agents and Claude
+# Code sessions live on that server; this machine is only a thin client, so the
+# same session shows up from every machine. Needs the `darkstar` ssh host alias.
+alias ds="herdr --remote darkstar"
+
 # export DISPLAY=$localhost:10.0  # WSL X-forwarding to an external X server on :10.
 # Disabled: under WSLg, DISPLAY is auto-set to :0; forcing :10.0 breaks GUI apps.
 # Re-enable only if you run VcXsrv/X410 on display :10.

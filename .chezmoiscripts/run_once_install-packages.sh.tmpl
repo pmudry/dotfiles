@@ -21,7 +21,7 @@ if ! command -v fastfetch >/dev/null 2>&1; then
     _tmp="$(mktemp -d)"
     if curl -fsSL "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.tar.gz" -o "$_tmp/ff.tgz"; then
         tar -xzf "$_tmp/ff.tgz" -C "$_tmp"
-        _bin="$(find "$_tmp" -type f -name fastfetch | head -n1)"
+        _bin="$(find "$_tmp" -type f -path "*/bin/fastfetch" | head -n1)"
         [ -n "$_bin" ] && install -m 0755 "$_bin" "$HOME/.local/bin/fastfetch"
     fi
     rm -rf "$_tmp"
