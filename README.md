@@ -135,6 +135,7 @@ darkstar. Code must live on darkstar too: edit it there, or through an IDE remot
 | darkstar rebooted | panes are gone, layout is restored; reopen Claude with `claude --resume` |
 | `chezmoi update` on darkstar complains about `.gitconfig` | `gh auth setup-git` writes there; `chezmoi apply --force` keeps the helper (it is in the template) |
 
-Removing or disabling the saved machine on a client (`herdr machine remove darkstar`) only
+Removing or disabling the saved machine on a client (`herdr machine remove <id>`, id from
+`herdr machine list`) only
 forgets the profile; nothing stops on the server. To stop the server for real:
 `ssh darkstar herdr server stop`.
